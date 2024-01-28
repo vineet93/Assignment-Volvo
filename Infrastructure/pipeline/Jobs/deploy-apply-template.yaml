@@ -1,0 +1,60 @@
+parameters:
+ - name: workingDirectory 
+   type: string 
+   default: ''
+ - name: workspaceName
+   type: string 
+   default: ''
+ - name: varFilePlan
+   type: string 
+   default: ''
+ - name: varFileApply
+   type: string 
+   default: ''
+ - name: servicePrincipal
+   type: string
+   default: ''
+ - name: stateFile
+   type: string
+   default: ''
+ - name: stateFileSub
+   type: string
+   default: ''
+ - name: stateFileRG
+   type: string
+   default: ''
+ - name: stateFileAccount
+   type: string
+   default: ''
+ - name: stateFileContainer
+   type: string
+   default: ''
+ - name: agentName
+   type: string 
+   default: ''
+
+
+jobs:          
+    - deployment: 'Deploy'
+      environment: InfraPlan
+      timeoutInMinutes: 180
+      pool:
+          name: 'test'
+          demands: 
+            - agent.name -equals ${{ parameters.agentName }}
+      strategy:
+        runOnce:
+          deploy:
+            steps:     
+              - template: ../steps/deploy-apply-template.yaml
+                parameters:
+                  workingDirectory:    ${{ parameters.workingDirectory   }}
+                  workspaceName:       ${{ parameters.workspaceName      }} 
+                  varFilePlan:         ${{ parameters.varFilePlan        }}
+                  varFileApply:        ${{ parameters.varFileApply       }}
+                  servicePrincipal:    ${{ parameters.servicePrincipal   }}
+                  stateFile:           ${{ parameters.stateFile          }}
+                  stateFileContainer:  ${{ parameters.stateFileContainer }}
+                  stateFileSub:        ${{ parameters.stateFileSub       }}
+                  stateFileRG:         ${{ parameters.stateFileRG        }}
+                  stateFileAccount:    ${{ parameters.stateFileAccount   }}

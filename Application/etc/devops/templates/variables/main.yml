@@ -1,0 +1,4 @@
+variables:
+
+  1Line.API.EnvCode: 'ci'
+  1Line.API.Profile: 'tacz'

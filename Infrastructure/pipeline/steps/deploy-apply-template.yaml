@@ -1,0 +1,99 @@
+parameters:
+ - name: workingDirectory 
+   type: string 
+   default: ''
+ - name: workspaceName
+   type: string 
+   default: ''
+ - name: varFilePlan
+   type: string 
+   default: ''
+ - name: varFileApply
+   type: string 
+   default: ''
+ - name: servicePrincipal
+   type: string
+   default: ''
+ - name: stateFile
+   type: string 
+   default: ''
+ - name: stateFileSub
+   type: string
+   default: ''
+ - name: stateFileRG
+   type: string
+   default: ''
+ - name: stateFileAccount
+   type: string
+   default: ''
+ - name: stateFileContainer
+   type: string
+   default: ''
+
+steps:
+      - checkout: none
+      - download: current
+        artifact: Drop
+
+      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
+        displayName: 'Terraform Installer'
+        inputs:
+          terraformVersion: 'latest'
+
+      - task: TerraformCLI@0
+        displayName: 'Terraform Init'
+        inputs:
+          backendType: 'azurerm'
+          command: 'init'
+          commandOptions: '-reconfigure'
+          workingDirectory:                 ${{ parameters.workingDirectory }}
+          backendServiceArm:                ${{ parameters.servicePrincipal }}
+          backendAzureRmSubscriptionId:     ${{ parameters.stateFileSub }}
+          backendAzureRmResourceGroupName:  ${{ parameters.stateFileRG }}
+          backendAzureRmStorageAccountName: ${{ parameters.stateFileAccount }}
+          backendAzureRmContainerName:      ${{ parameters.stateFileContainer}}
+          backendAzureRmKey: 'terraform.tfstate'
+
+      # Switch workspace or create if it doesn't exist yet
+      - template: ../steps/workspace-template.yaml
+        parameters:
+           workspaceName:             ${{ parameters.workspaceName }}
+           workingDirectory:          ${{ parameters.workingDirectory }}
+
+      - task: TerraformCLI@0
+        displayName: 'Terraform Init'
+        inputs:
+          backendType: 'azurerm'
+          command: 'init'
+          workingDirectory:                 ${{ parameters.workingDirectory }}
+          backendServiceArm:                ${{ parameters.servicePrincipal }}
+          backendAzureRmSubscriptionId:     ${{ parameters.stateFileSub }}
+          backendAzureRmResourceGroupName:  ${{ parameters.stateFileRG }}
+          backendAzureRmStorageAccountName: ${{ parameters.stateFileAccount }}
+          backendAzureRmContainerName:      ${{ parameters.stateFileContainer}}
+          backendAzureRmKey: 'terraform.tfstate'
+
+      # Switch workspace or create if it doesn't exist yet
+      - template: ../steps/workspace-template.yaml
+        parameters:
+           workspaceName:           ${{ parameters.workspaceName }}
+           workingDirectory:        ${{ parameters.workingDirectory }}
+
+      - task: TerraformTaskV2@2
+        displayName: 'Terraform Validate'
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory:           ${{ parameters.workingDirectory }}
+
+      - template: ../steps/plan-template.yaml
+        parameters:
+           workingDirectory:          ${{ parameters.workingDirectory }}
+           varFilePlan:               ${{ parameters.varFilePlan      }}
+           servicePrincipal:          ${{ parameters.servicePrincipal }}
+      
+      - template: ../steps/apply-template.yaml
+        parameters:
+           workingDirectory:          ${{ parameters.workingDirectory }}
+           varFileApply:              ${{ parameters.varFileApply     }}
+           servicePrincipal:          ${{ parameters.servicePrincipal }}

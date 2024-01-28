@@ -1,0 +1,21 @@
+parameters:
+ - name: workingDirectory 
+   type: string 
+   default: ''
+ - name: varFileApply
+   type: string 
+   default: ''
+ - name: servicePrincipal
+   type: string
+   default: ''
+
+
+steps:
+   - task: TerraformTaskV2@2
+     displayName: 'Terraform Apply'
+     inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: ${{ parameters.workingDirectory }}
+          commandOptions: ${{ parameters.varFileApply }}
+          environmentServiceNameAzureRM: ${{ parameters.servicePrincipal }}

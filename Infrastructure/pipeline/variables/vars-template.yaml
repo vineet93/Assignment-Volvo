@@ -1,0 +1,13 @@
+variables:
+  agentName: vm-x-agent
+
+  devServicePrincipal:   "arm-dev-contributor"
+
+  devStateFileContainer: "strgconttfbackendstatefile"
+  devStateFileSub:       "1e13c830-8252-44d8-8e59-de2c691e522d"
+  devStateFileRG:        "rg-test"
+  devStateFileAccount:   "strgtfbackendstatefile"
+
+
+  varFileDevPlan: "--var-file=environments/terraform-dev.tfvars -out=terraform_azure.tfplan"
+  varFileDevApply: "--var-file=environments/terraform-dev.tfvars --auto-approve"

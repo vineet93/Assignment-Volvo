@@ -1,0 +1,18 @@
+parameters:
+ - name: workingDirectory 
+   type: string 
+   default: ''
+ - name: workspaceName
+   type: string 
+   default: ''
+
+
+steps:
+
+   - task: Bash@3
+     displayName: 'Switch to ${{ parameters.workspaceName }} Workspace'
+     inputs:
+          targetType: 'inline'
+          script: |
+             terraform workspace select ${{ parameters.workspaceName }} || terraform workspace new ${{ parameters.workspaceName }}
+          workingDirectory: ${{ parameters.workingDirectory }}

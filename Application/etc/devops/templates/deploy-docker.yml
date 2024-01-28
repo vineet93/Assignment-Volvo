@@ -1,0 +1,32 @@
+steps:
+- task: Bash@3
+  displayName: Dump all Environment variables 
+  inputs:
+          targetType: 'inline'
+          script: 'env | sort'
+          
+- download: none
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifactName: 'API-Artifacts'
+
+- bash: |
+    sudo docker build -t $(acrserver)/sample-api:$(Build.BuildNumber) .
+  workingDirectory: $(Pipeline.Workspace)
+  displayName: 'Docker Build'
+      
+- bash: |
+      sudo docker login $(acrserver) --username $DockerUsername --password $DockerPassword
+      sudo docker push $(acrserver)/sample-api:$(Build.BuildNumber)
+  workingDirectory: $(Pipeline.Workspace)
+  displayName: 'Docker Push'
+  env:
+    DockerUsername: $(Docker.username)
+    DockerPassword: $(Docker.password)
+
+- script: |
+    sudo docker rmi -f $(acrserver)/sample-api:$(Build.BuildNumber)
+  displayName: "Post Build Docker Cleanup"
+  continueOnError: true
+  condition: always()

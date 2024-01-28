@@ -1,0 +1,22 @@
+# Default values for gaskit-api-workflow.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+environment: 'dev'
+
+replicaCount: 1
+
+image:
+  tag: '0.0.0'
+  repository: ''
+  pullPolicy: Always
+
+service:
+  type: LoadBalancer
+  port: 80
+
+appBaseLocation: '/app'
+
+imageCredentials:
+  registry: ''
+  username: ''
+  password: ''

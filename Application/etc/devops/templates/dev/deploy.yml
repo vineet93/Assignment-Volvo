@@ -1,0 +1,65 @@
+parameters:
+- name: AKSrgName
+  type: string
+  default: 'rg-volvo'
+
+- name: AKSInstanceName
+  type: string
+  default: 'aks-dev-volvo'
+
+stages:
+- stage: Deploy_Dev
+  dependsOn: Build
+  variables:
+    - name: Environment
+      value: "dev"
+    - name: acrserver
+      value: "acrdevvolvo.azurecr.io"
+    - name: acrlogin
+      value: "acrdevvolvo"
+    - name: major
+      value: 1
+    - name: minor
+      value: 0
+    - name: revision
+      value: $[counter(variables['major'], 0)]
+
+  jobs:
+  - job: Docker_Deploy
+    pool:
+      name: 'test'
+    workspace:
+      clean: all 
+    displayName: 'Deploy Docker Image'
+    steps:
+          - template: ../deploy-docker.yml
+
+  - job: HELM_Package
+    dependsOn: 
+      - Docker_Deploy
+    displayName: 'Helm Packaging'
+    pool:
+      name: 'test'
+    variables:
+      - group: App-Deploy-Volvo
+    workspace:
+      clean: all 
+    steps:
+          - template: ../package-helm.yml
+
+  - job: K8s_Deploy
+    dependsOn: 
+      - Docker_Deploy
+      - HELM_Package
+    displayName: 'K8s Deploy'
+    pool:
+      name: 'test'
+    variables:
+      - group: App-Deploy-Volvo
+    workspace:
+      clean: all 
+    steps:
+          - template: ../deploy-k8s.yml
+            parameters:
+              AKSrgName:           ${{ parameters.AKSrgName           }}
+              AKSInstanceName:     ${{ parameters.AKSInstanceName     }}

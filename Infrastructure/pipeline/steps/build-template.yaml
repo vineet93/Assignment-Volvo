@@ -1,0 +1,14 @@
+parameters:
+ - name: targetPath 
+   type: string 
+   default: ''
+
+steps:
+
+    - checkout: self
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: ${{ parameters.targetPath }}
+        artifact: 'Drop'
+        publishLocation: 'pipeline'

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "App.Deployment.Name" . }}
+  labels:
+    {{- include "App.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      {{- include "App.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "App.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+      imagePullSecrets: 
+        - name: {{ include "App.RegistrySecret.Name" . }}
+      containers:
+        - name: {{ .Values.application.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.application.port }}
+              protocol: TCP

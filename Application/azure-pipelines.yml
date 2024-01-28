@@ -1,0 +1,17 @@
+name: $(Year:yy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+       - none
+      
+  paths:
+    include:
+      - 'SampleApi/*'
+
+stages:
+
+- template: etc/devops/templates/build.yml
+
+#Deploying to Dev Instance.
+- template: etc/devops/templates/dev/deploy.yml 

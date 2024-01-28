@@ -1,0 +1,72 @@
+parameters:
+- name: gradletasks
+  type: string
+  default: 'build'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool: 'test'
+    workspace:
+      clean: all
+    displayName: 'Build API'
+    steps:
+
+      - task: Bash@3
+        displayName: Dump all Environment variables 
+        inputs:
+          targetType: 'inline'
+          script: 'env | sort'
+
+      - task: Maven@3
+        displayName: 'Build Application'
+        inputs:
+          mavenPomFile: 'SampleApi/pom.xml'
+          goals: 'clean install -DskipTests'
+          mavenOptions: "-Xmx3072m"
+          publishJUnitResults: true
+          javaHomeOption: 'Path'
+          jdkDirectory: '/usr/lib/jvm/java-8-openjdk-amd64'
+          mavenVersionOption: 'Path'
+          mavenDirectory: '/opt/apache-maven-3.6.3'
+          mavenSetM2Home: false
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
+          sqMavenPluginVersionChoice: 'latest'
+
+      - task: CopyFiles@2
+        displayName: 'Copy JAR to: $(Build.ArtifactStagingDirectory)'
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/SampleApi/target'
+          Contents: |
+            SampleApi-0.0.1-SNAPSHOT.jar
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/deploymentfiles'
+
+      - task: CopyFiles@2
+        displayName: 'Copy DockerFiles to: $(Build.ArtifactStagingDirectory)'
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/etc/devops/docker-files/'
+          Contents: |
+            **
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/deploymentfiles'
+
+      - task: CopyFiles@2
+        displayName: 'Copy helm-charts to: $(Build.ArtifactStagingDirectory)'
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/etc/devops/helm-charts/'
+          Contents: |
+            **
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/helm-charts'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish API Artifacts'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)/deploymentfiles' 
+          artifactName: 'API-Artifacts'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Helm Files'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)/helm-charts' 
+          artifactName: 'Helm-Files'

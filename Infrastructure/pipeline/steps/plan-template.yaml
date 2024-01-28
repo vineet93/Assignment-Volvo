@@ -1,0 +1,20 @@
+parameters:
+ - name: workingDirectory 
+   type: string 
+   default: ''
+ - name: varFilePlan
+   type: string 
+   default: ''
+ - name: servicePrincipal
+   type: string
+   default: ''
+
+steps: 
+   - task: TerraformTaskV2@2
+     displayName: 'Terraform Plan'
+     inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          commandOptions:                 ${{ parameters.varFilePlan }}
+          workingDirectory:               ${{ parameters.workingDirectory }}
+          environmentServiceNameAzureRM:  ${{ parameters.servicePrincipal }}

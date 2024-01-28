@@ -1,0 +1,71 @@
+trigger:
+  - 'none'
+
+# Parameters show up in the pipeline UI as options once 'Run pipeline' is selected
+parameters:
+  - name: environment
+    displayName: "Choose environment"
+    type: string
+    default: dev
+    values:
+      - dev
+
+  - name: plan
+    displayName: "Choose Terraform action"
+    type: string
+    default: plan
+    values:
+      - plan
+      - apply
+
+variables:
+  - template: pipeline/variables/vars-template.yaml
+
+stages:
+  # 1. The build step will run regardless of the environment and terraform action selected.
+  - stage: Build
+    jobs:
+      - template: pipeline/Jobs/build-template.yaml
+        parameters:
+          agentName: ${{ variables.agentName }}
+          targetPath: "$(Pipeline.Workspace)"
+
+  # 2. The next action the pipeline performs is dependent on the environment and action selected.
+  #       1. plan dev
+  #       2. apply dev
+  - ? ${{ if and(eq(parameters.environment, 'dev'), contains(parameters.plan, 'plan')) }}
+    : - stage: Dev
+        displayName: "Plan Dev"
+        dependsOn: Build
+        condition: succeeded()
+        jobs:
+          - template: pipeline/Jobs/deploy-plan-template.yaml
+            parameters:
+              workspaceName:        "dev"
+              agentName:            ${{ variables.agentName             }}
+              workingDirectory:     "$(Pipeline.Workspace)/Drop/s/"
+              varFilePlan:          ${{ variables.varFileDevPlan        }}
+              servicePrincipal:     ${{ variables.devServicePrincipal   }}
+              stateFileSub:         ${{ variables.devStateFileSub       }}
+              stateFileRG:          ${{ variables.devStateFileRG        }}
+              stateFileAccount:     ${{ variables.devStateFileAccount   }}
+              stateFileContainer:   ${{ variables.devStateFileContainer }}
+
+  - ? ${{ if and(eq(parameters.environment, 'dev'), contains(parameters.plan, 'apply')) }}
+    : - stage: Dev
+        displayName: "Deploy to the Dev environment"
+        dependsOn: Build
+        condition: succeeded()
+        jobs:
+          - template: pipeline/Jobs/deploy-apply-template.yaml
+            parameters:
+              workspaceName: "dev"
+              agentName:            ${{ variables.agentName             }}
+              workingDirectory:     "$(Pipeline.Workspace)/Drop/s/"
+              varFilePlan:          ${{ variables.varFileDevSBPlan      }}
+              varFileApply:         ${{ variables.varFileDevApply       }}
+              servicePrincipal:     ${{ variables.devServicePrincipal   }}
+              stateFileSub:         ${{ variables.devStateFileSub       }}
+              stateFileRG:          ${{ variables.devStateFileRG        }}
+              stateFileAccount:     ${{ variables.devStateFileAccount   }}
+              stateFileContainer:   ${{ variables.devStateFileContainer }}

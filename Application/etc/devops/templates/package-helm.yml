@@ -1,0 +1,17 @@
+steps:
+- download: none
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifactName: 'Helm-Files'
+
+- bash: |
+    helm package ./sample-api-workflow --app-version "$(Build.BuildNumber)" --version="$(major).$(minor).$(revision)-sample-$(Environment)" --debug --namespace sample-api-$(Environment)
+  workingDirectory: $(Pipeline.Workspace)
+  displayName: 'Package Helm Files'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish HELM Artifacts'
+  inputs:
+    pathToPublish: '$(Pipeline.Workspace)/sample-api-workflow-$(major).$(minor).$(revision)-sample-$(Environment).tgz' 
+    artifactName: 'HELM-Artifacts'

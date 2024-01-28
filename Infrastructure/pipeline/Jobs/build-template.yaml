@@ -1,0 +1,21 @@
+parameters:
+ - name: targetPath 
+   type: string 
+   default: ''
+ - name: agentName
+   type: string 
+   default: ''
+
+
+jobs:
+  - job: Build
+
+    pool:
+      name: 'test'
+      demands: 
+         - agent.name -equals ${{ parameters.agentName }}
+
+    steps:
+    - template: ../steps/build-template.yaml
+      parameters:
+        targetPath: ${{ parameters.targetPath }}
