@@ -1,20 +1,30 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+Platform Engineer practical test :- 
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+1.) Create a sample application to print “Welcome to 2022”and user agent info using any
+programming language.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+[Vineet] : Application is created in the application folder and has to rest endpoint.
+    1.) /api --> Returns the message "Welcome to 2022".
+    2.) /agent --> Returns the agent Informtion.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+2.) Create a VNet in Azure or VPC in AWS or GCP with your own CIDR choice using best
+practices.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+[Vineet] : Vnet is created in Azure Cloud using Iac tool. Terraform is used for Infrastructure provisioning and code is present in Infrastructure folder.
+
+3.) Build your application and create container image to deploy your application.
+
+[Vineet] : Maven is used a build tool to package the Spring Boot Application and it is configured as a task in Azure Devops Pipeline. Once the Jar is created it's published as Azure Artifacts and Copied into Docker File Context. Docker Image is built out of Docker File and it is pushed to Azure Container Registry. Helm is used as a packaginf tool which automates the creation, packaging, configuration, and deployment of Kubernetes applications by combining your configuration files into a single reusable package. Azure Kubernetes Service is used as container orchestration platform for deployment if application.
+
+4.) Deploy your application using any type of automated pipeline on container orchestration
+platform in Azure or AWS or GCP.
+
+[Vineet] :  azure-pipeline.yml file is present in Application folder which is used to deploy the application end to end on AKS Cluster.
+
+5.) Give us an endpoint to access your application.
+
+[Vineet] :
+
+1.) http://20.88.248.180/api -- Returns the Message "Welcome to 2022"
+2.) http://20.88.248.180/agent -- Returns the Agent Information.
+
