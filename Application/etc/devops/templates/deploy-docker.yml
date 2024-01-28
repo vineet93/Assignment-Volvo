@@ -12,18 +12,15 @@ steps:
     artifactName: 'API-Artifacts'
 
 - bash: |
-    sudo docker build -t $(acrserver)/sample-api:$(Build.BuildNumber) .
+    docker build -t $(acrserver)/sample-api:$(Build.BuildNumber) .
   workingDirectory: $(Pipeline.Workspace)
   displayName: 'Docker Build'
       
-- bash: |
-      sudo docker login $(acrserver) --username $DockerUsername --password $DockerPassword
-      sudo docker push $(acrserver)/sample-api:$(Build.BuildNumber)
+- script: |
+      docker login $(acrserver) --username $(DockerUsername) --password $(DockerPassword)
+      docker push $(acrserver)/sample-api:$(Build.BuildNumber)
   workingDirectory: $(Pipeline.Workspace)
   displayName: 'Docker Push'
-  env:
-    DockerUsername: $(Docker.username)
-    DockerPassword: $(Docker.password)
 
 - script: |
     sudo docker rmi -f $(acrserver)/sample-api:$(Build.BuildNumber)

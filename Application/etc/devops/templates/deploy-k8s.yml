@@ -18,9 +18,6 @@ steps:
   displayName: 'Connecting to Cluster'
 
 - bash: |
-      helm upgrade sample ./sample-api-workflow-$(major).$(minor).$(revision)-sample-$(Environment).tgz --install --set-string application.name=sample --set application.port=8080 --set-string image.repository=$(acrserver)/sample-api --set-string image.tag=$(Build.BuildNumber) --set-string imageCredentials.registry=$(acrserver) --set-string imageCredentials.username=$DockerUsername --set-string imageCredentials.password=$DockerPassword --namespace sample-api-$(Environment) --create-namespace --debug --cleanup-on-fail --wait
+      helm upgrade sample ./sample-api-workflow-$(major).$(minor).$(revision)-sample-$(Environment).tgz --install --set-string application.name=sample --set application.port=8080 --set-string image.repository=$(acrserver)/sample-api --set-string image.tag=$(Build.BuildNumber) --set-string imageCredentials.registry=$(acrserver) --set-string imageCredentials.username=$(DockerUsername) --set-string imageCredentials.password=$(DockerPassword) --namespace sample-api-$(Environment) --create-namespace --debug --cleanup-on-fail --wait
   workingDirectory: $(Pipeline.Workspace)
   displayName: 'HELM Deployment'
-  env:
-    DockerUsername: $(Docker.username)
-    DockerPassword: $(Docker.password)

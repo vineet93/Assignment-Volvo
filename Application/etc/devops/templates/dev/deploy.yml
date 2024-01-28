@@ -41,7 +41,7 @@ stages:
     pool:
       name: 'test'
     variables:
-      - group: App-Deploy-Volvo
+      - group: App-Deploy-Volvo 
     workspace:
       clean: all 
     steps:
@@ -62,4 +62,4 @@ stages:
           - template: ../deploy-k8s.yml
             parameters:
               AKSrgName:           ${{ parameters.AKSrgName           }}
-              AKSInstanceName:     ${{ parameters.AKSInstanceName     }}
+              AKSInstanceName:     ${{ parameters.AKSInstanceName     }} 
